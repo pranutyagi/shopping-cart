@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8
+    container_name: mysql-shopping-cart
+    environment:
+      MYSQL_DATABASE: shopping_cart_db
+      MYSQL_ROOT_PASSWORD: root123
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - shopping-cart-net
+
+  shopping-cart-app:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    container_name: shopping-cart-app
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/shopping_cart_db
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root123
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    ports:
+      - "9193:9193"
+    depends_on:
+      - mysql
+    networks:
+      - shopping-cart-net
+
+volumes:
+  mysql_data:
+
+networks:
+  shopping-cart-net:
